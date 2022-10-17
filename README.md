@@ -1,26 +1,26 @@
-## Mod 1 - Project 2 - Battleship
+# Mod 1 - Project 2 - Battleship
 
-# Collaborators
+## Collaborators
 -Brandon Gray
 -Elle Majors
 
-# Iteration 1
-# Classes
+## Iteration 1
+### Classes
 -Ship
 -Cell
 
-# Iteration 2
-# Classes
+## Iteration 2
+### Classes
 -Board
-  # Methods
+  ### Methods
   -initialize
   -valid_coordinate?
   -valid_placement?
   -place_ship
   -render
 
-# Iteration 3
-# Classes (Potential)
+## Iteration 3
+### Classes (Potential)
 -MainMenu
 -Setup
 -Turn
