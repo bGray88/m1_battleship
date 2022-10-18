@@ -48,14 +48,20 @@ describe Cell do
   describe "#render" do
     it 'Displays current cell status via character' do
       cell = Cell.new("B4")
-
-      expect(cell.render).to eq(".")
-
       cruiser = Ship.new()
       cell.place_ship(cruiser)
-      
+
       expect(cell.render).to eq(".")
       expect(cell.render(true)).to eq("S")
+
+      cell.fire_upon
+
+      expect(cell.render).to eq("H")
+
+      cell.fire_upon
+      cell.fire_upon
+
+      expect(cell.render).to eq("X")
     end
   end
 end

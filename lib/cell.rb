@@ -2,11 +2,11 @@
 
 class Cell
 
-  attr_reader :ship, :cells
+  attr_reader :ship, :status
 
   def initialize(coord)
     @coord = coord
-    @cells = {@coord => nil}
+    @status = {@coord => nil}
     @renders = [".", "M", "H", "X", "S"]
     @ship = nil
     @fired_upon = false
@@ -17,12 +17,12 @@ class Cell
   end
 
   def empty?
-    @cells[@coord].nil?
+    @status[@coord].nil?
   end
 
   def place_ship(ship)
     @ship = ship
-    @cells[@coord] = 0
+    @status[@coord] = 0
   end
 
   def fired_upon?
@@ -31,28 +31,44 @@ class Cell
 
   def fire_upon
     @fired_upon = true
-    @ship ? (@ship.hit; @cells[@coord] = 2) : @cells[@coord] = 1
+    if @ship 
+      @ship.hit
+        if @ship.health > 0
+          @status[@coord] = 2
+        else
+          @status[@coord] = 3
+        end
+    else
+      @status[@coord] = 1
+    end
   end
 
   def render(show = false)
-    if fired_upon?
-      if @ship.health != 0
-        @ship ? (return @renders[2]) : (return @renders[1])
+    if !empty?
+      if fired_upon?
+        @renders[@status[@coord]]
       else
-        return @renders[3]
+        if show && @ship
+          @renders[4]
+        else
+          @renders[@status[@coord]]
+        end
       end
     else
-      show && @ship ? (return @renders[4]) : (return @renders[0])
+      @renders[0]
     end
   end
 end
 
 class Ship
+
+attr_reader :health
+
   def initialize()
-    
+    @health = 3
   end
 
   def hit
-
+    @health -= 1
   end
 end
