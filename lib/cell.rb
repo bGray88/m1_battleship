@@ -12,7 +12,7 @@ class Cell
     @fired_upon = false
   end
 
-  def coordinate
+  def coordinate 
     @coord
   end
 
