@@ -59,16 +59,3 @@ class Cell
     end
   end
 end
-
-class Ship
-
-attr_reader :health
-
-  def initialize()
-    @health = 3
-  end
-
-  def hit
-    @health -= 1
-  end
-end
