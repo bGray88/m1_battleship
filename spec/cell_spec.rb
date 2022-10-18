@@ -1,4 +1,4 @@
-# require './lib/ship'
+require './lib/ship'
 require './lib/cell'
 require 'rspec'
 
