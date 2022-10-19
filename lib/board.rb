@@ -1,4 +1,5 @@
 require './lib/cell'
+require 'pry'
 
 class Board
 
@@ -17,8 +18,24 @@ class Board
 
     width.each do |letter|
       height.times do |number|
-        @cells[("#{letter}#{number + 1}")] = Cell.new("#{letter}#{number + 1}")
+        coord = "#{letter}#{number + 1}"
+        @cells[(coord)] = Cell.new(coord)
       end
+    end
+  end
+
+  def valid_coordinate(coord)
+    @cells.keys.include?(coord)
+  end
+
+  def valid_placement(ship, coords)
+    if ship.health == coords.length
+      coords.each do |coord|
+        if valid_coordinate(coord) == false
+          return false
+        end
+      end
+      return true
     end
   end
 end

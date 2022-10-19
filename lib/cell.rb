@@ -2,60 +2,47 @@ require './lib/ship'
 
 class Cell
 
-  attr_reader :ship, :status
+  attr_reader :ship, :status, :coordinate
 
   def initialize(coord)
-    @coord = coord
-    @status = nil
+    @coordinate = coord
+    @status = 0
     @renders = [".", "M", "H", "X", "S"]
     @ship = nil
     @fired_upon = false
   end
 
-  def coordinate 
-    @coord
-  end
-
   def empty?
-    @status.nil?
+    @status == 0
   end
 
   def place_ship(ship)
     @ship = ship
-    @status = 0
+    @status = 4
   end
 
-  def fired_upon?
+  def fired_upon? 
     @fired_upon
   end
 
   def fire_upon
-    @fired_upon = true
-    if @ship 
-      @ship.hit
-      if @ship.sunk
-        @status = 3
-      else
+    if !@fired_upon
+      @fired_upon = true
+      if @ship 
+        @ship.hit
         @status = 2
+      else
+        @status = 1
       end
-    else
-      @status = 1
     end
   end
 
   def render(show = false)
-    if !empty?
-      if fired_upon?
-        @renders[@status]
-      else
-        if show && @ship
-          @renders[4]
-        else
-          @renders[@status]
-        end
-      end
-    else
+    if @status == 4 && !show
       @renders[0]
+    else
+      @status = 3 if @ship.sunk?
+      @renders[@status]
     end
   end
 end
