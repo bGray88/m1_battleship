@@ -13,5 +13,9 @@ RSpec.describe Game do
     end
   end
 
+  xit 'repeats welcome at game end' do
+    greeting = Game.new("Welcome to BATTLESHIP--Enter p to play. Enter q to quit")
 
+    expect(greeting.game_end).to be_an_instance_of(Game)
+  end
 end
