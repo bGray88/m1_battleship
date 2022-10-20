@@ -22,7 +22,7 @@ describe Cell do
   describe '#ship' do
     it 'Accepts ship instance and places it' do
       cell = Cell.new("B4")
-      cruiser = Ship.new()
+      cruiser = Ship.new("Cruiser", 3)
       cell.place_ship(cruiser)
 
       expect(cell.ship).to be_instance_of(Ship)
@@ -33,35 +33,41 @@ describe Cell do
   describe '#fired_upon' do
     it 'Details effect of damage to ship' do
       cell = Cell.new("B4")
-      cruiser = Ship.new()
+      cruiser = Ship.new("Submarine", 2)
       cell.place_ship(cruiser)
 
       expect(cell.fired_upon?).to be false
 
       cell.fire_upon
 
-      # expect(cell.ship.health).to eq(2)
+      expect(cell.ship.health).to eq(2)
       expect(cell.fired_upon?).to be true
     end
   end
 
   describe "#render" do
     it 'Displays current cell status via character' do
-      cell = Cell.new("B4")
-      cruiser = Ship.new()
-      cell.place_ship(cruiser)
+      cell_1 = Cell.new("A4")
+      cell_2 = Cell.new("B4")
+      cell_3 = Cell.new("C4")
+      cruiser = Ship.new("Cruiser", 3)
+      cell_1.place_ship(cruiser)
+      cell_2.place_ship(cruiser)
+      cell_3.place_ship(cruiser)
 
-      expect(cell.render).to eq(".")
-      expect(cell.render(true)).to eq("S")
+      expect(cell_1.render).to eq(".")
+      expect(cell_1.render(true)).to eq("S")
 
-      cell.fire_upon
+      cell_1.fire_upon
 
-      expect(cell.render).to eq("H")
+      expect(cell_1.render).to eq("H")
 
-      cell.fire_upon
-      cell.fire_upon
+      cell_2.fire_upon
+      cell_3.fire_upon
 
-      expect(cell.render).to eq("X")
+      expect(cell_1.render).to eq("X")
+      expect(cell_2.render).to eq("X")
+      expect(cell_3.render).to eq("X")
     end
   end
 end
