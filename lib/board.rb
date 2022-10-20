@@ -38,12 +38,14 @@ class Board
       return false if !consecutive?(coords, 1)
     elsif uniq_size?(coords, 1)
       return false if !consecutive?(coords, 0)
+    else
+      return false
     end
     return true
   end
 
   def uniq_size?(collection, idx)
-    collection.map {|element| element[idx]}.uniq.size <= 1
+    collection.map {|element| element[idx]}.uniq.size == 1
   end
 
   def consecutive?(collection, idx)

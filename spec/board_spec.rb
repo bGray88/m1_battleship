@@ -44,6 +44,7 @@ describe Board do
       expect(board.valid_placement?(cruiser, ["A1", "A2", "A3"])).to be true
       expect(board.valid_placement?(cruiser, ["A1", "A2"])).to be false
       expect(board.valid_placement?(cruiser, ["A1", "A2", "A4"])).to be false
+      expect(board.valid_placement?(cruiser, ["A1", "B2", "C3"])).to be false
       # expect(board.valid_placement?(submarine, ["A2", "A5"])).to be false
       # expect(board.valid_placement?(submarine, ["A2", "A3"])).to be true
       # expect(board.valid_placement?(submarine, ["A2", "A4"])).to be false
