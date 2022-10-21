@@ -21,6 +21,7 @@ class Board
         @cells[(coord)] = Cell.new(coord)
       end
     end
+    @cells = @cells.sort.to_h
   end
 
   def valid_coordinate?(coord)

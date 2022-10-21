@@ -34,6 +34,8 @@ class Cell
       else
         @status = 1
       end
+    else
+      :repeat
     end
   end
 
