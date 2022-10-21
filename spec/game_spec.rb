@@ -1,21 +1,21 @@
 require 'rspec'
 require './lib/ship'
 require './lib/cell'
-# require './lib/board'
+require './lib/board'
 require './lib/game'
 
 RSpec.describe Game do
   describe '#initialize' do
-    it 'has a welcome message' do
-    greeting = Game.new("Welcome to BATTLESHIP--Enter p to play. Enter q to quit")
+    it 'exit' do
+    game = Game.new
 
-    expect(greeting.welcome).to eq("Welcome to BATTLESHIP--Enter p to play. Enter q to quit")
+    expect(game).to be_an_instance_of(Game)
     end
   end
 
   xit 'repeats welcome at game end' do
-    greeting = Game.new("Welcome to BATTLESHIP--Enter p to play. Enter q to quit")
+    game = Game.new
 
-    expect(greeting.game_end).to be_an_instance_of(Game)
+    expect(game_end).to be_an_instance_of(Game)
   end
 end
