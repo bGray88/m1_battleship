@@ -21,6 +21,7 @@ class Board
         @cells[(coord)] = Cell.new(coord)
       end
     end
+    @cells = @cells.sort.to_h
   end
 
   def valid_coordinate?(coord)
@@ -33,10 +34,10 @@ class Board
       return false if !valid_coordinate?(coord)
       return false if !@cells[coord].empty?
     end
-    if uniq_size?(coords, 0)
-      return false if uniq_size?(coords, 1)
+    if repeat_char?(coords, 0)
+      return false if repeat_char?(coords, 1)
       return false if !consecutive?(coords, 1)
-    elsif uniq_size?(coords, 1)
+    elsif repeat_char?(coords, 1)
       return false if !consecutive?(coords, 0)
     else
       return false
@@ -44,7 +45,7 @@ class Board
     return true
   end
 
-  def uniq_size?(collection, idx)
+  def repeat_char?(collection, idx)
     collection.map {|element| element[idx]}.uniq.size == 1
   end
 
