@@ -21,14 +21,14 @@ class Cell
     @status = 4
   end
 
-  def fired_upon? 
+  def fired_upon?
     @fired_upon
   end
 
   def fire_upon
     if !@fired_upon
       @fired_upon = true
-      if @ship 
+      if @ship
         @ship.hit
         @status = 2
       else
@@ -41,8 +41,10 @@ class Cell
     if @status == 4 && !show
       @renders[0]
     else
-      @status = 3 if @ship.sunk?
-      @renders[@status]
+      if @ship
+        @status = 3 if @ship.sunk?
+      end
+      @renders[@status]  
     end
   end
 end

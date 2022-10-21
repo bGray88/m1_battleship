@@ -53,4 +53,26 @@ class Board
     proper_arr = (collection.first[idx].ord..collection.last[idx].ord).to_a
     user_arr == proper_arr
   end
+
+  def place(ship, coords)
+    if valid_placement?(ship, coords)
+      coords.each do |coord|
+        @cells[coord].place_ship(ship)
+      end
+    end
+  end
+
+  def render(show = false)
+    @cells_render = @cells.values.map do |cell|
+      "#{cell.render(show)} "
+    end
+    @cells_lines = @cells_render.each_slice(4).to_a
+    first_line = @width.map do |number|
+      "#{number} "
+    end.unshift("  ").push("\n").join
+    remaining_lines = @height.map.with_index do |letter, idx|
+      "#{letter} #{@cells_lines[idx].join}\n"
+    end.join
+    (first_line + remaining_lines)
+  end
 end

@@ -15,7 +15,7 @@ describe Board do
   describe '#build_board' do
     it 'Creates a board of size attribute' do
       board = Board.new
-      
+
       expect(board.cells.size).to eq(16)
       expect(board.cells).to be_instance_of(Hash)
       expect(board.cells.keys[0]).to eq("A1")
@@ -48,6 +48,29 @@ describe Board do
       expect(board.valid_placement?(submarine, ["A2", "A5"])).to be false
       expect(board.valid_placement?(submarine, ["A2", "A3"])).to be true
       expect(board.valid_placement?(submarine, ["A2", "A4"])).to be false
+    end
+  end
+
+  describe '#place' do
+    it 'Confirms placement of ship' do
+      board = Board.new
+      cruiser = Ship.new("Cruiser", 3)
+      submarine = Ship.new("Submarine", 2)
+
+      expect(board.cells["A1"].render).to eq(".")
+      board.place(cruiser, ["A1", "A2", "A3"])
+      expect(board.cells["A1"].render(true)).to eq("S")
+      expect(board.cells["A2"].render(true)).to eq("S")
+      expect(board.cells["A3"].render(true)).to eq("S")
+    end
+  end
+
+  describe '#place' do
+    it 'Confirms placement of ship' do
+      board = Board.new
+      cruiser = Ship.new("Cruiser", 3)
+      board.place(cruiser, ["A1", "A2", "A3"])
+      expect(board.render).to eq("  1 2 3 4 \nA . . . . \nB . . . . \nC . . . . \nD . . . . \n")
     end
   end
 end
