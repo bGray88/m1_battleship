@@ -67,7 +67,7 @@ describe Board do
   end
 
   describe '#place' do
-    it 'Confirms placement of ship' do
+    it 'Allows placement of ship' do
       board = Board.new
       cruiser = Ship.new("Cruiser", 3)
       submarine = Ship.new("Submarine", 2)
@@ -83,7 +83,7 @@ describe Board do
   end
 
   describe '#render' do
-    it 'Confirms proper layout of user interface' do
+    it 'Shows proper ship placement and layout of user interface' do
       board = Board.new
       cruiser = Ship.new("Cruiser", 3)
       submarine = Ship.new("Submarine", 2)
@@ -103,10 +103,21 @@ describe Board do
       expect(board.render).to eq(layout_no_show)
       expect(board.render(true)).to eq(layout_show)
 
+      layout_no_show = "  1 2 3 4 \n" +
+                          "A . . . . \n" +
+                          "B . . . . \n" +
+                          "C . . . . \n" +
+                          "D . . . . \n"
+      layout_show = "  1 2 3 4 \n" +
+                          "A S S S . \n" +
+                          "B S . . . \n" +
+                          "C . . . . \n" +
+                          "D . . . . \n"
+
       board.place(submarine, ["A1", "B1"])
 
-      expect(board.render).to eq(layout_no_show)
-      expect(board.render(true)).to eq(layout_show)
+      expect(board.render == layout_no_show).to be true
+      expect(board.render == layout_show).to be false
 
       board.place(submarine, ["B1", "C1"])
 

@@ -40,7 +40,7 @@ describe Cell do
 
       cell.fire_upon
 
-      expect(cell.ship.health).to eq(2)
+      expect(cell.ship.health).to eq(1)
       expect(cell.fired_upon?).to be true
     end
   end

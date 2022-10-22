@@ -3,20 +3,20 @@ require 'pry'
 
 class Board
 
-  attr_reader :cells, :height, :width, :size
+  attr_reader :cells, :side, :size, :height_chars, :width_nums
 
   def initialize()
     @size = 16
-    @alpha = ('A'..'Z').to_a
-    @height = @alpha[0..(Math.sqrt(@size).to_i - 1)]
-    @width = (1..(Math.sqrt(@size).to_i)).to_a
+    @side = Math.sqrt(@size).to_i
+    @height_chars = ('A'..'Z').to_a[0..(@side - 1)]
+    @width_nums = (1..@side).to_a
     @cells = {}
     build_board
   end
 
   def build_board
-    @height.each do |letter|
-      @width.each do |number|
+    @height_chars.each do |letter|
+      @width_nums.each do |number|
         coord = "#{letter}#{number}"
         @cells[(coord)] = Cell.new(coord)
       end
@@ -31,15 +31,13 @@ class Board
   def fire_shot(coord)
     if valid_coordinate?(coord)
       @cells[coord].fire_upon
+    else
+      :invalid
     end
   end
 
   def random_cell
     @cells.values.shuffle[0]
-  end
-
-  def get_fire_result(coord)
-    @cells[coord].status
   end
 
   def valid_placement?(ship, coords)
@@ -69,25 +67,19 @@ class Board
 
   def place(ship, coords)
     if valid_placement?(ship, coords)
-      coords.each do |coord|
-        @cells[coord].place_ship(ship)
-      end
+      coords.each {|coord| @cells[coord].place_ship(ship)}
     else
       :invalid
     end
   end
 
   def render(show = false)
-    @cells_render = @cells.values.map do |cell|
-      "#{cell.render(show)} "
-    end
-    @cells_lines = @cells_render.each_slice(4).to_a
-    first_line = @width.map do |number|
-      "#{number} "
-    end.unshift("  ").push("\n").join
-    remaining_lines = @height.map.with_index do |letter, idx|
+    @cells_render = @cells.values.map {|cell| "#{cell.render(show)} "}
+    @cells_lines = @cells_render.each_slice(@side).to_a
+    first_line = @width_nums.map {|number| "#{number} "}.unshift("  ").push("\n")
+    remaining_lines = @height_chars.map.with_index do |letter, idx| 
       "#{letter} #{@cells_lines[idx].join}\n"
-    end.join
-    (first_line + remaining_lines)
+    end
+    (first_line.join + remaining_lines.join)
   end
 end

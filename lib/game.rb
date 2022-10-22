@@ -11,15 +11,22 @@ class Game
     @com_board = nil
     @player_ships = nil
     @com_ships = nil
+    @player_curr_turn = {
+      coord: "",
+      status: ""
+    }
+    @com_curr_turn = {
+      coord: "",
+      status: ""
+    }
   end
 
   def play
-    start_game = get_player_choice(:greet)
-    while start_game == 'p'
+    loop do
+      play_game = get_player_choice(:greet, 'p', 'q')
+      break if play_game == 'q'
+      setup_game
       print_message(:add_placement)
-      set_boards
-      set_ships
-      com_place_ships
       puts @player_board.render(true)
       place_ship(0, :cruiser_prompt)
       puts @player_board.render(true)
@@ -29,38 +36,59 @@ class Game
         puts @com_board.render
         puts @player_board.render(true)
         print_message(:shoot_prompt)
-        p_curr_coord = ""
-        p_curr_status = ""
         loop do
-          p_curr_coord = input
-          p_curr_status = @com_board.fire_shot(p_curr_coord)
-          if p_curr_status == :repeat
-            print_message(:invalid_shot)
-            p_curr_coord = input
-            p_curr_status = @com_board.fire_shot(p_curr_coord)
+          @player_curr_turn[:coord] = input
+          @player_curr_turn[:status] = @com_board.fire_shot(@player_curr_turn[:coord])
+          if @player_curr_turn[:status] == :repeat
+            print_message(:repeat_shot)
+            @player_curr_turn[:coord] = input
+            @player_curr_turn[:status] = @com_board.fire_shot(@player_curr_turn[:coord])
             break
+          elsif @player_curr_turn[:status] == :invalid
+            print_message(:invalid_shot)
           else
             break
           end
         end
         if game_end == :p_wins
           print_message(:p_won)
+          break
         end
-        c_curr_coord = ""
-        c_curr_status = ""
         loop do
-          c_curr_coord = com_shot
-          c_curr_status = @player_board.fire_shot(c_curr_coord)
-          break if c_curr_status != :repeat
+          @com_curr_turn[:coord] = com_shot
+          @com_curr_turn[:status] = @player_board.fire_shot(@com_curr_turn[:coord])
+          break if @com_curr_turn[:status] != :repeat
         end
         if game_end == :c_wins
           print_message(:c_won)
+          break
         end
-        print_message(:c_shot_result, c_curr_coord, c_curr_status)
-        print_message(:p_shot_result, p_curr_coord, p_curr_status)
+        print_message(:c_shot_result, @com_curr_turn.values)
+        print_message(:p_shot_result, @player_curr_turn.values)
       end
-      start_game = get_player_choice(:greet)
     end
+  end
+
+  def setup_game
+    set_boards
+    set_ships
+    com_place_ships
+  end
+
+  def set_boards
+    @player_board = Board.new
+    @com_board = Board.new
+  end
+
+  def set_ships
+    @player_ships = [
+      p_cruiser = Ship.new("Cruiser", 3),
+      p_submarine = Ship.new("Submarine", 2)
+    ]
+    @com_ships = [
+      c_cruiser = Ship.new("Cruiser", 3),
+      c_submarine = Ship.new("Submarine", 2)
+    ]
   end
 
   def place_ship(idx, msg)
@@ -78,14 +106,13 @@ class Game
   def com_place_ships()
     @com_ships.each do |com_ship|
       loop do
-        board_size = @com_board.width.size
         bound = com_ship.length
 
-        consec_pool = [@com_board.height, @com_board.width]
+        consec_pool = [@com_board.height_chars, @com_board.width_nums]
         repeat_pool = consec_pool.delete(consec_pool.sample)
         repeat_val = repeat_pool.sample
         
-        start_range = (1..(board_size - bound + 1))
+        start_range = (1..(@com_board.side - bound + 1))
         first = start_range.to_a.sample
         last = first + bound - 1
 
@@ -106,49 +133,35 @@ class Game
     @player_board.random_cell.coordinate
   end
 
-  def set_boards
-    @player_board = Board.new
-    @com_board = Board.new
-  end
-
-  def set_ships
-    @player_ships = [
-      p_cruiser = Ship.new("Cruiser", 3),
-      p_submarine = Ship.new("Submarine", 2)
-    ]
-    @com_ships = [
-      c_cruiser = Ship.new("Cruiser", 3),
-      c_submarine = Ship.new("Submarine", 2)
-    ]
-  end
-
-  def print_message(key, coord = "", status = "")
+  def print_message(key, results = [])
     messages = {
-      greet: "Welcome to BATTLESHIP \n" +
-      "Enter p to play. Enter q to quit \n",
-      add_placement: "I have laid out my ships on the grid. \n" +
-      "You now need to lay your two ships. \n" +
-      "The Cruiser is three units long and the Submarine is two units long. \n",
+      greet:          "Welcome to BATTLESHIP \n" +
+                      "Enter p to play. Enter q to quit \n",
+      add_placement:  "I have laid out my ships on the grid. \n" +
+                      "You now need to lay your two ships. \n" +
+                      "The Cruiser is three units long and the Submarine is two units long. \n",
       cruiser_prompt: "Enter the squares for the Cruiser (3 spaces): \n",
-      sub_prompt: "Enter the squares for the Submarine (2 spaces):\n",
-      invalid_place: "Those are invalid coordinates. Please try again: \n",
-      shoot_prompt: "Enter the coordinates of your shot: \n",
-      invalid_shot: "That is an invalid coordinate. Please try again: \n",
-      c_shot_result: "My shot on #{coord} was a #{status}. \n",
-      p_shot_result: "Your shot on #{coord} was a #{status}. \n", 
-      c_won: "I won! \n",
-      p_won: "You won! \n",
+      sub_prompt:     "Enter the squares for the Submarine (2 spaces):\n",
+      invalid_place:  "Those are invalid coordinates. Please try again: \n",
+      shoot_prompt:   "Enter the coordinates of your shot: \n",
+      invalid_shot:   "That is an invalid coordinate. Please try again: \n",
+      repeat_shot:    "You've fired here before. Please try again: \n",
+      c_shot_result:  "My shot on #{results[0]} was a #{results[1]}. \n",
+      p_shot_result:  "Your shot on #{results[0]} was a #{results[1]}. \n", 
+      c_won:          "I won! \n",
+      p_won:          "You won! \n",
     }
     puts messages[key]
   end
 
-  def get_player_choice(msg)
+  def get_player_choice(msg, first, second)
     print_message(msg)
-    start_prompt = input.downcase
-    until start_prompt == 'p' || start_prompt == 'q'
-      start_prompt = input.downcase
+    prompt_response = ""
+    loop do 
+      prompt_response = input.downcase
+      break if prompt_response == first || prompt_response == second
     end
-    start_prompt
+    prompt_response
   end
 
   def game_end
