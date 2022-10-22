@@ -6,19 +6,25 @@ class Cell
 
   def initialize(coord)
     @coordinate = coord
-    @status = 0
-    @renders = [".", "M", "H", "X", "S"]
+    @status = :empty
+    @renders = {
+      empty: ".", 
+      miss: "M",
+      hit: "H", 
+      sunk: "X", 
+      ship: "S"
+    }
     @ship = nil
     @fired_upon = false
   end
 
   def empty?
-    @status == 0
+    @status == :empty
   end
 
   def place_ship(ship)
     @ship = ship
-    @status = 4
+    @status = :ship
   end
 
   def fired_upon?
@@ -30,9 +36,13 @@ class Cell
       @fired_upon = true
       if @ship
         @ship.hit
-        @status = 2
+        if @ship.sunk?
+          @status = :sunk
+        else
+          @status = :hit
+        end
       else
-        @status = 1
+        @status = :miss
       end
     else
       :repeat
@@ -40,11 +50,11 @@ class Cell
   end
 
   def render(show = false)
-    if @status == 4 && !show
-      @renders[0]
+    if @status == :ship && !show
+      @renders[:empty]
     else
       if @ship
-        @status = 3 if @ship.sunk?
+        @status = :sunk if @ship.sunk?
       end
       @renders[@status]  
     end

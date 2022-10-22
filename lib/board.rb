@@ -3,7 +3,7 @@ require 'pry'
 
 class Board
 
-  attr_reader :cells
+  attr_reader :cells, :height, :width, :size
 
   def initialize()
     @size = 16
@@ -28,15 +28,27 @@ class Board
     @cells.keys.include?(coord)
   end
 
+  def fire_shot(coord)
+    if valid_coordinate?(coord)
+      @cells[coord].fire_upon
+    end
+  end
+
+  def random_cell
+    @cells.values.shuffle[0]
+  end
+
+  def get_fire_result(coord)
+    @cells[coord].status
+  end
+
   def valid_placement?(ship, coords)
     return false if ship.health != coords.length
     coords.each do |coord|
-      return false if !valid_coordinate?(coord)
-      return false if !@cells[coord].empty?
+      return false if !valid_coordinate?(coord) || !@cells[coord].empty?
     end
     if repeat_char?(coords, 0)
-      return false if repeat_char?(coords, 1)
-      return false if !consecutive?(coords, 1)
+      return false if repeat_char?(coords, 1) || !consecutive?(coords, 1)
     elsif repeat_char?(coords, 1)
       return false if !consecutive?(coords, 0)
     else
@@ -60,6 +72,8 @@ class Board
       coords.each do |coord|
         @cells[coord].place_ship(ship)
       end
+    else
+      :invalid
     end
   end
 
