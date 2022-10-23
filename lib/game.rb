@@ -25,7 +25,9 @@ class Game
     loop do
       play_game = get_player_choice(:greet, 'p', 'q')
       break if play_game == 'q'
-      setup_game
+      set_boards
+      set_ships
+      com_place_ships
       print_message(:add_placement)
       puts @player_board.render(true)
       place_ship(0, :cruiser_prompt)
@@ -69,12 +71,6 @@ class Game
     end
   end
 
-  def setup_game
-    set_boards
-    set_ships
-    com_place_ships
-  end
-
   def set_boards
     @player_board = Board.new
     @com_board = Board.new
@@ -106,23 +102,8 @@ class Game
   def com_place_ships()
     @com_ships.each do |com_ship|
       loop do
-        bound = com_ship.length
-
-        consec_pool = [@com_board.height_chars, @com_board.width_nums]
-        repeat_pool = consec_pool.delete(consec_pool.sample)
-        repeat_val = repeat_pool.sample
-        
-        start_range = (1..(@com_board.side - bound + 1))
-        first = start_range.to_a.sample
-        last = first + bound - 1
-
-        coords = (first..last).to_a.map do |idx|
-          "#{repeat_val}#{consec_pool.flatten[idx - 1]}"
-        end
-        if /\d/.match?(repeat_val.to_s)
-          coords = coords.map {|coord| coord.reverse}
-        end
-        if @com_board.place(com_ship, coords) != :invalid
+        com_coords = @com_board.all_placements(com_ship).sample
+        if @com_board.place(com_ship, com_coords) != :invalid
           break
         end
       end
