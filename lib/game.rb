@@ -4,13 +4,19 @@ require './lib/board'
 require 'pry'
 
 class Game
-  attr_reader
+  attr_reader :player_board, :com_board, :player_ships, :com_ships
 
   def initialize()
-    @player_board = nil
-    @com_board = nil
-    @player_ships = nil
-    @com_ships = nil
+    @player_board = Board.new
+    @com_board = Board.new
+    @player_ships = [
+      p_cruiser = Ship.new("Cruiser", 3),
+      p_submarine = Ship.new("Submarine", 2)
+    ]
+    @com_ships = [
+      c_cruiser = Ship.new("Cruiser", 3),
+      c_submarine = Ship.new("Submarine", 2)
+    ]
     @player_curr_turn = {
       coord: "",
       status: ""
@@ -23,7 +29,12 @@ class Game
 
   def play
     loop do
-      play_game = get_player_choice(:greet, 'p', 'q')
+      play_game = ""
+      loop do 
+        print_message(:greet)
+        play_game = input(:choice)
+        break if play_game == 'p' || play_game == 'q'
+      end
       break if play_game == 'q'
       set_boards
       set_ships
@@ -97,7 +108,6 @@ class Game
     print_message(msg)
     loop do
       user_coords = input
-      user_coords = user_coords.split.map {|coord| coord.capitalize}
       if @player_board.place(@player_ships[idx], user_coords) != :invalid
         break
       end
@@ -143,22 +153,16 @@ class Game
     puts messages[key]
   end
 
-  def get_player_choice(msg, first, second)
-    print_message(msg)
-    prompt_response = ""
-    loop do 
-      prompt_response = input.downcase
-      break if prompt_response == first || prompt_response == second
-    end
-    prompt_response
-  end
-
   def game_end
     return :c_wins if @player_ships.all? {|p_ship| p_ship.sunk?}
     return :p_wins if @com_ships.all? {|c_ship| c_ship.sunk?}
   end
 
-  def input
-    gets.chomp.capitalize
-  end
+  def input(type = "")
+    if type == :choice 
+      gets.chomp.downcase
+    else 
+      gets.chomp.split.map {|coord| coord.capitalize} 
+    end
+  end 
 end
