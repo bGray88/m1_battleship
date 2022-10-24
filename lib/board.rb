@@ -33,6 +33,10 @@ class Board
     @cells = @cells.sort.to_h
   end
 
+  def random_cell
+    @cells.values.shuffle[0]
+  end
+
   def all_coordinates
     @cells.keys
   end
@@ -45,20 +49,8 @@ class Board
     all_coordinates.include?(coord)
   end
 
-  def fire_shot(coord)
-    if valid_coordinate?(coord)
-      @cells[coord].fire_upon
-    else
-      :invalid
-    end
-  end
-
-  def random_cell
-    @cells.values.shuffle[0]
-  end
-
   def valid_placement?(ship, coords)
-    return false if ship.health != coords.length
+    return false if ship.length != coords.length
     coords.each do |coord|
       return false if !valid_coordinate?(coord) || !@cells[coord].empty?
     end
@@ -67,9 +59,12 @@ class Board
   end
 
   def all_placements(ship)
-    vert_cons = all_coordinates.each_cons(ship.length).to_a
-    hor_cons = rotate_coordinates.each_cons(ship.length).to_a
-    vert_cons + hor_cons
+    all_cons_lines = (all_coordinates + rotate_coordinates).each_slice(side)
+    all_cons_split = []
+    all_cons_lines.each do |con| 
+      all_cons_split += con.each_cons(ship.length).to_a
+    end
+    all_cons_split
   end
 
   def consecutive?(ship, collection)
@@ -87,10 +82,18 @@ class Board
   def render(show = false)
     cells_render = @cells.values.map {|cell| "#{cell.render(show)} "}
     cells_lines = cells_render.each_slice(side).to_a
-    first_line = width_nums.map {|number| "#{number} "}.unshift("  ").push("\n")
+    first_line = width_nums.map {|number| "#{number} "}.unshift("\n  ").push("\n")
     remaining_lines = height_chars.map.with_index do |letter, idx| 
       "#{letter} #{cells_lines[idx].join}\n"
     end
-    (first_line + remaining_lines).join
+    "#{(first_line + remaining_lines).join}\n"
+  end
+
+  def fire_shot(coord)
+    if valid_coordinate?(coord)
+      @cells[coord].fire_upon
+    else
+      :invalid
+    end
   end
 end

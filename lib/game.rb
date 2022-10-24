@@ -35,7 +35,9 @@ class Game
       place_ship(1, :sub_prompt)
       puts @player_board.render(true)
       loop do
+        puts print_message(:c_header)
         puts @com_board.render
+        puts print_message(:p_header)
         puts @player_board.render(true)
         print_message(:shoot_prompt)
         loop do
@@ -54,6 +56,8 @@ class Game
         end
         if game_end == :p_wins
           print_message(:p_won)
+          puts print_message(:c_header)
+          puts @com_board.render
           break
         end
         loop do
@@ -63,6 +67,8 @@ class Game
         end
         if game_end == :c_wins
           print_message(:c_won)
+          puts print_message(:p_header)
+          puts @player_board.render(true)
           break
         end
         print_message(:c_shot_result, @com_curr_turn.values)
@@ -131,6 +137,8 @@ class Game
       p_shot_result:  "Your shot on #{results[0]} was a #{results[1]}. \n", 
       c_won:          "I won! \n",
       p_won:          "You won! \n",
+      c_header:       "#{"=" * 13}COMPUTER BOARD#{"=" * 13} \n",
+      p_header:       "#{"=" * 14}PLAYER BOARD#{"=" * 14} \n"
     }
     puts messages[key]
   end
