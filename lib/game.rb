@@ -8,37 +8,29 @@ class Game
 
   def initialize()
     @player_board = Board.new
-    @com_board = Board.new
+    @com_board    = Board.new
     @player_ships = [
-      p_cruiser = Ship.new("Cruiser", 3),
+      p_cruiser   = Ship.new("Cruiser", 3),
       p_submarine = Ship.new("Submarine", 2)
     ]
     @com_ships = [
-      c_cruiser = Ship.new("Cruiser", 3),
+      c_cruiser   = Ship.new("Cruiser", 3),
       c_submarine = Ship.new("Submarine", 2)
     ]
-    @player_curr_turn = {
-      coord: "",
-      status: ""
-    }
-    @com_curr_turn = {
-      coord: "",
-      status: ""
-    }
+    @player_curr_turn = []
+    @com_curr_turn    = []
+    com_place_ships
   end
 
   def play
     loop do
       play_game = ""
-      loop do 
+      loop do
         print_message(:greet)
         play_game = input(:choice)
         break if play_game == 'p' || play_game == 'q'
       end
       break if play_game == 'q'
-      set_boards
-      set_ships
-      com_place_ships
       print_message(:add_placement)
       puts @player_board.render(true)
       place_ship(0, :cruiser_prompt)
@@ -52,48 +44,30 @@ class Game
         puts @player_board.render(true)
         print_message(:shoot_prompt)
         loop do
-          @player_curr_turn[:coord] = input
-          @player_curr_turn[:status] = @com_board.fire_shot(@player_curr_turn[:coord])
-          if @player_curr_turn[:status] == :repeat
+          @player_curr_turn = @com_board.fire_shot(input(:fire))
+          if @player_curr_turn[0] == :repeat
             print_message(:repeat_shot)
-            @player_curr_turn[:coord] = input
-            @player_curr_turn[:status] = @com_board.fire_shot(@player_curr_turn[:coord])
-            break
-          elsif @player_curr_turn[:status] == :invalid
+          elsif @player_curr_turn[0] == :invalid
             print_message(:invalid_shot)
           else
             break
           end
         end
-        if game_end == :p_wins
-          print_message(:p_won)
-          puts print_message(:c_header)
-          puts @com_board.render
-          break
-        end
+        break if game_end
         loop do
-          @com_curr_turn[:coord] = com_shot
-          @com_curr_turn[:status] = @player_board.fire_shot(@com_curr_turn[:coord])
-          break if @com_curr_turn[:status] != :repeat
+          @com_curr_turn = @player_board.fire_shot(com_shot)
+          break if @com_curr_turn[0] != :repeat
         end
-        if game_end == :c_wins
-          print_message(:c_won)
-          puts print_message(:p_header)
-          puts @player_board.render(true)
-          break
-        end
-        print_message(:c_shot_result, @com_curr_turn.values)
-        print_message(:p_shot_result, @player_curr_turn.values)
+        break if game_end
+        print_message(:c_shot_result, @com_curr_turn)
+        print_message(:p_shot_result, @player_curr_turn)
       end
     end
   end
 
-  def set_boards
+  def reset_game
     @player_board = Board.new
     @com_board = Board.new
-  end
-
-  def set_ships
     @player_ships = [
       p_cruiser = Ship.new("Cruiser", 3),
       p_submarine = Ship.new("Submarine", 2)
@@ -102,6 +76,7 @@ class Game
       c_cruiser = Ship.new("Cruiser", 3),
       c_submarine = Ship.new("Submarine", 2)
     ]
+    com_place_ships
   end
 
   def place_ship(idx, msg)
@@ -127,10 +102,10 @@ class Game
   end
 
   def com_shot
-    @player_board.random_cell.coordinate
+    @player_board.random_coordinate
   end
 
-  def print_message(key, results = [])
+  def print_message(key, results = {})
     messages = {
       greet:          "Welcome to BATTLESHIP \n" +
                       "Enter p to play. Enter q to quit \n",
@@ -143,8 +118,8 @@ class Game
       shoot_prompt:   "Enter the coordinates of your shot: \n",
       invalid_shot:   "That is an invalid coordinate. Please try again: \n",
       repeat_shot:    "You've fired here before. Please try again: \n",
-      c_shot_result:  "My shot on #{results[0]} was a #{results[1]}. \n",
-      p_shot_result:  "Your shot on #{results[0]} was a #{results[1]}. \n", 
+      c_shot_result:  "My shot on #{results[1]} was a #{results[0]}. \n",
+      p_shot_result:  "Your shot on #{results[1]} was a #{results[0]}. \n", 
       c_won:          "I won! \n",
       p_won:          "You won! \n",
       c_header:       "#{"=" * 13}COMPUTER BOARD#{"=" * 13} \n",
@@ -154,14 +129,31 @@ class Game
   end
 
   def game_end
-    return :c_wins if @player_ships.all? {|p_ship| p_ship.sunk?}
-    return :p_wins if @com_ships.all? {|c_ship| c_ship.sunk?}
+    if @player_ships.all? {|p_ship| p_ship.sunk?}
+      game_winner(:c_won, :p_header, @player_board)
+      reset_game
+      true
+    elsif @com_ships.all? {|c_ship| c_ship.sunk?}
+      game_winner(:p_won, :c_header, @com_board)
+      reset_game
+      true
+    else
+      false
+    end
+  end
+
+  def game_winner(winner, loser_header, loser_board)
+    puts print_message(winner)
+    puts print_message(loser_header)
+    puts loser_board.render(true)
   end
 
   def input(type = "")
     if type == :choice 
       gets.chomp.downcase
-    else 
+    elsif type == :fire
+      gets.chomp.capitalize
+    else
       gets.chomp.split.map {|coord| coord.capitalize} 
     end
   end 

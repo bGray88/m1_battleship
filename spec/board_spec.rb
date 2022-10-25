@@ -47,14 +47,14 @@ describe Board do
     end
   end
 
-  describe '#random_cell?' do
+  describe '#random_coordinate' do
     it 'Returns random coordinate value from valid range' do
       board = Board.new
 
 
-      expect(board.valid_coordinate?(board.random_cell.coordinate)).to be true
-      expect(board.valid_coordinate?(board.random_cell.coordinate)).to be true
-      expect(board.valid_coordinate?(board.random_cell.coordinate)).to be true
+      expect(board.valid_coordinate?(board.random_coordinate)).to be true
+      expect(board.valid_coordinate?(board.random_coordinate)).to be true
+      expect(board.valid_coordinate?(board.random_coordinate)).to be true
     end
   end
 
@@ -222,14 +222,14 @@ describe Board do
       board = Board.new
       cruiser = Ship.new("Cruiser", 3)
 
-      expect(board.fire_shot("C1")).to eq(:miss)
+      expect(board.fire_shot("C1")).to eq([:miss, "C1"])
       
       board.place(cruiser, ["A1", "A2", "A3"])
 
-      expect(board.fire_shot("C1")).to eq(:repeat)
-      expect(board.fire_shot("A1")).to eq(:hit)
-      expect(board.fire_shot("B1")).to eq(:miss)
-      expect(board.fire_shot("Z1")).to eq(:invalid)
+      expect(board.fire_shot("C1")).to eq([:repeat, "C1"])
+      expect(board.fire_shot("A1")).to eq([:hit, "A1"])
+      expect(board.fire_shot("B1")).to eq([:miss, "B1"])
+      expect(board.fire_shot("Z1")).to eq([:invalid, "Z1"])
     end
   end
 end

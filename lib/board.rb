@@ -33,8 +33,8 @@ class Board
     @cells = @cells.sort.to_h
   end
 
-  def random_cell
-    @cells.values.shuffle[0]
+  def random_coordinate
+    @cells.values.shuffle[0].coordinate
   end
 
   def all_coordinates
@@ -91,9 +91,9 @@ class Board
 
   def fire_shot(coord)
     if valid_coordinate?(coord)
-      @cells[coord].fire_upon
+      [@cells[coord].fire_upon, coord]
     else
-      :invalid
+      [:invalid, coord]
     end
   end
 end
