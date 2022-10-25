@@ -32,10 +32,7 @@ class Game
       break if play_game == 'q'
       print_message(:add_placement)
       puts @player_board.render(true)
-      place_ship(0, :cruiser_prompt)
-      puts @player_board.render(true)
-      place_ship(1, :sub_prompt)
-      puts @player_board.render(true)
+      player_place_ships
       loop do
         puts print_message(:c_header)
         puts @com_board.render
@@ -78,18 +75,20 @@ class Game
     com_place_ships
   end
 
-  def place_ship(idx, msg)
-    print_message(msg)
-    loop do
-      user_coords = input
-      if @player_board.place(@player_ships[idx], user_coords) != :invalid
-        break
+  def player_place_ships
+    @player_ships.each_with_index do |play_ship, idx|
+      print_message(play_ship.name)
+      loop do
+        if @player_board.place(play_ship, input) != :invalid
+          break
+        end
+        print_message(:invalid_place)
       end
-      print_message(:invalid_place)
+      puts @player_board.render(true)
     end
   end
 
-  def com_place_ships()
+  def com_place_ships
     @com_ships.each do |com_ship|
       loop do
         com_coords = @com_board.all_placements(com_ship).sample
@@ -111,8 +110,8 @@ class Game
       add_placement:  "I have laid out my ships on the grid. \n" +
                       "You now need to lay your two ships. \n" +
                       "The Cruiser is three units long and the Submarine is two units long. \n",
-      cruiser_prompt: "Enter the squares for the Cruiser (3 spaces): \n",
-      sub_prompt:     "Enter the squares for the Submarine (2 spaces):\n",
+      "Cruiser" =>    "Enter the squares for the Cruiser (3 spaces): \n",
+      "Submarine" =>  "Enter the squares for the Submarine (2 spaces):\n",
       invalid_place:  "Those are invalid coordinates. Please try again: \n",
       shoot_prompt:   "Enter the coordinates of your shot: \n",
       invalid_shot:   "That is an invalid coordinate. Please try again: \n",
