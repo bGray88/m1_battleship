@@ -49,12 +49,12 @@ class Game
             break
           end
         end
-        break if game_end
+        break if game_end?
         loop do
           @com_curr_turn = @player_board.fire_shot(com_shot)
           break if @com_curr_turn[0] != :repeat
         end
-        break if game_end
+        break if game_end?
         print_message(:c_shot_result, @com_curr_turn)
         print_message(:p_shot_result, @player_curr_turn)
       end
@@ -76,7 +76,7 @@ class Game
   end
 
   def player_place_ships
-    @player_ships.each_with_index do |play_ship, idx|
+    @player_ships.each do |play_ship|
       print_message(play_ship.name)
       loop do
         if @player_board.place(play_ship, input) != :invalid
@@ -126,7 +126,7 @@ class Game
     puts messages[key]
   end
 
-  def game_end
+  def game_end?
     if @player_ships.all? {|p_ship| p_ship.sunk?}
       game_winner(:c_won, :p_header, @player_board)
       reset_game
@@ -140,10 +140,10 @@ class Game
     end
   end
 
-  def game_winner(winner, loser_header, loser_board)
+  def game_winner(winner, lose_header, lose_board)
     puts print_message(winner)
-    puts print_message(loser_header)
-    puts loser_board.render(true)
+    puts print_message(lose_header)
+    puts lose_board.render(true)
   end
 
   def input(type = "")
