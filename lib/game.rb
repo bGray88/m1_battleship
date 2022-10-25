@@ -25,10 +25,9 @@ class Game
   def play
     loop do
       play_game = ""
-      loop do
+      until play_game == 'p' || play_game == 'q'
         print_message(:greet)
         play_game = input(:choice)
-        break if play_game == 'p' || play_game == 'q'
       end
       break if play_game == 'q'
       print_message(:add_placement)
